@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Description Compliance Checker - Avoid Costly Legal Mistakes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #ffffff;
+            --accent-primary: #00b865;
+            --accent-secondary: #0099cc;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --error: #dc2626;
+            --warning: #d97706;
+            --success: #00b865;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Archivo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-top: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #166534;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1.25rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: var(--accent-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 184, 101, 0.3);
+            background: #009954;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .score-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .score-value.high { color: var(--success); }
+        .score-value.medium { color: var(--warning); }
+        .score-value.low { color: var(--error); }
+
+        .score-description {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Issues List */
+        .issues-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .issue-card {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--error);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            animation: slideInLeft 0.4s ease-out;
+        }
+
+        .issue-card.warning { border-left-color: var(--warning); }
+        .issue-card.info { border-left-color: var(--accent-secondary); }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+
+        .issue-severity {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .issue-severity.critical {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--error);
+        }
+
+        .issue-severity.warning {
+            background: rgba(255, 165, 2, 0.2);
+            color: var(--warning);
+        }
+
+        .issue-severity.info {
+            background: rgba(0, 204, 255, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .issue-description {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .issue-example {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: #0369a1;
+            margin-top: 0.75rem;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .recommendations ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .recommendations li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .recommendations li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        .footer-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .main-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Description Compliance Checker</h1>
+            <p class="subtitle">Instantly detect legal risks, biased language, and compliance violations in your job postings</p>
+            <span class="badge">⚡ AI-Powered Analysis</span>
+        </header>
+
+        <div class="main-card">
+            <div class="input-section">
+                <label for="jobDescription">Paste Your Job Description</label>
+                <textarea 
+                    id="jobDescription" 
+                    placeholder="Software Engineer
+
+We're looking for a young, energetic developer who can hit the ground running...
+
+Requirements:
+- 5+ years experience
+- Bachelor's degree required
+- Native English speaker
+- etc."
+                ></textarea>
+            </div>
+
+            <button id="analyzeBtn" class="btn-primary">Analyze</button>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">Analyzing your job description...</p>
+            </div>
+
+            <div id="results" class="results">
+                <div class="score-card">
+                    <div class="score-label">Compliance Score</div>
+                    <div id="scoreValue" class="score-value">0</div>
+                    <div id="scoreDescription" class="score-description"></div>
+                </div>
+
+                <div id="issuesContainer" class="issues-section">
+                    <!-- Issues will be inserted here -->
+                </div>
+
+                <div id="recommendationsContainer" class="recommendations">
+                    <!-- Recommendations will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Built to help HR professionals avoid costly legal mistakes</p>
+            <p style="margin-top: 0.5rem;">Powered by AI • No data stored • Instant results</p>
+            <p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); max-width: 800px; margin-left: auto; margin-right: auto; font-size: 0.8125rem; line-height: 1.5;">
+                <strong>Legal Disclaimer:</strong> This tool provides general guidance and should not be considered legal advice. Compliance requirements vary by jurisdiction, industry, and specific circumstances. Always consult with a qualified employment attorney or HR professional before posting job descriptions or making employment decisions. Use of this tool does not create an attorney-client relationship.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const jobDescriptionInput = document.getElementById('jobDescription');
+        const loadingEl = document.getElementById('loading');
+        const resultsEl = document.getElementById('results');
+        const scoreValueEl = document.getElementById('scoreValue');
+        const scoreDescriptionEl = document.getElementById('scoreDescription');
+        const issuesContainer = document.getElementById('issuesContainer');
+        const recommendationsContainer = document.getElementById('recommendationsContainer');
+
+        analyzeBtn.addEventListener('click', analyzeJobDescription);
+
+        async function analyzeJobDescription() {
+            const jobDescription = jobDescriptionInput.value.trim();
+
+            if (!jobDescription) {
+                alert('Please enter a job description to analyze');
+                return;
+            }
+
+            // Show loading state
+            analyzeBtn.disabled = true;
+            resultsEl.classList.remove('active');
+            loadingEl.classList.add('active');
+
+            try {
+                // Call Claude API
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 2000,
+                        messages: [{
+                            role: 'user',
+                            content: `You are an expert HR compliance auditor. Analyze this job description for legal compliance issues, biased language, and regulatory violations.
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Provide your analysis in the following JSON format (respond ONLY with valid JSON, no other text):
+
+{
+  "score": <number 0-100>,
+  "scoreLevel": "<high|medium|low>",
+  "scoreDescription": "<brief description>",
+  "issues": [
+    {
+      "severity": "<critical|warning|info>",
+      "title": "<issue title>",
+      "description": "<detailed explanation>",
+      "example": "<quote from job description if applicable>"
+    }
+  ],
+  "recommendations": [
+    "<actionable recommendation 1>",
+    "<actionable recommendation 2>"
+  ]
+}
+
+Check for:
+- Age discrimination (words like "young", "energetic", "digital native", "recent graduate")
+- Gender bias (unnecessary gendered pronouns, "rockstar", "ninja")
+- Disability discrimination (requirements that exclude disabilities unnecessarily)
+- National origin discrimination ("native speaker", citizenship requirements)
+- Unnecessary degree requirements
+- Missing EEO statements
+- Salary transparency issues (depending on jurisdiction)
+- ADA compliance
+- FLSA classification issues (exempt vs non-exempt language)
+- Overly specific requirements that might exclude qualified candidates
+
+Score:
+- 80-100: Excellent compliance
+- 60-79: Moderate issues
+- 0-59: Significant legal risks`
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Extract JSON from response
+                let analysisText = data.content[0].text;
+                
+                // Remove markdown code blocks if present
+                analysisText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                
+                const analysis = JSON.parse(analysisText);
+
+                // Display results
+                displayResults(analysis);
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during analysis. Please try again.\n\nNote: This demo requires Claude API access. Make sure you have API credits available.');
+            } finally {
+                loadingEl.classList.remove('active');
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        function displayResults(analysis) {
+            // Update score
+            scoreValueEl.textContent = analysis.score;
+            scoreValueEl.className = `score-value ${analysis.scoreLevel}`;
+            scoreDescriptionEl.textContent = analysis.scoreDescription;
+
+            // Display issues
+            if (analysis.issues && analysis.issues.length > 0) {
+                issuesContainer.innerHTML = `
+                    <h2 class="section-title">
+                        <span>⚠️</span> Issues Found (${analysis.issues.length})
+                    </h2>
+                `;
+
+                analysis.issues.forEach((issue, index) => {
+                    const issueCard = document.createElement('div');
+                    issueCard.className = `issue-card ${issue.severity}`;
+                    issueCard.style.animationDelay = `${index * 0.1}s`;
+                    
+                    issueCard.innerHTML = `
+                        <div class="issue-header">
+                            <div class="issue-title">${issue.title}</div>
+                            <div class="issue-severity ${issue.severity}">${issue.severity}</div>
+                        </div>
+                        <div class="issue-description">${issue.description}</div>
+                        ${issue.example ? `<div class="issue-example">"${issue.example}"</div>` : ''}
+                    `;
+                    
+                    issuesContainer.appendChild(issueCard);
+                });
+            } else {
+                issuesContainer.innerHTML = `
+                    <h2 class="section-title">
+                        <span>✅</span> No Major Issues Found
+                    </h2>
+                    <p style="color: var(--text-secondary);">Your job description looks compliant! See recommendations below for minor improvements.</p>
+                `;
+            }
+
+            // Display recommendations
+            if (analysis.recommendations && analysis.recommendations.length > 0) {
+                recommendationsContainer.innerHTML = `
+                    <h2 class="section-title">
+                        <span>💡</span> Recommendations
+                    </h2>
+                    <ul>
+                        ${analysis.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                recommendationsContainer.innerHTML = '';
+            }
+
+            // Show results
+            resultsEl.classList.add('active');
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Allow Enter key to analyze (with Ctrl/Cmd modifier)
+        jobDescriptionInput.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                analyzeJobDescription();
+            }
+        });
+    </script>
+</body>
+</html>
